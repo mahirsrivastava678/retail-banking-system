@@ -1,0 +1,13 @@
+package com.mahir.retailbanking;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class RetailBankingSystemApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(RetailBankingSystemApplication.class, args);
+	}
+
+}
