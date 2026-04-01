@@ -1,50 +1,41 @@
 package com.mahir.retailbanking.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
 
 @Entity
-@Table(name = "account")   // ✅ Table ka naam specify karo agar DB me "account" hai
 public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")   // DB column name
     private int id;
 
-    @Column(name = "user_id")   // DB column name
-    private int userId;
+    private String accountNumber;
+    private double balance;
+    private String accountType;
+    private String status;
 
-    @Column(name = "account_no")   // DB column name
-    private String accountNo;
-
-    @Column(name = "balance")   // DB column name
-    private String balance;
-    // ✅ Default constructor (Hibernate ke liye mandatory)
     public Account() {}
 
-    // ✅ Parameterized constructor
-    public Account(int id, int userId, String accountNo, String balance) {
+    public Account(int id, String accountNumber, double balance, String accountType, String status) {
         this.id = id;
-        this.userId = userId;
-        this.accountNo = accountNo;
+        this.accountNumber = accountNumber;
         this.balance = balance;
+        this.accountType = accountType;
+        this.status = status;
     }
 
-    // ✅ Getters and Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
-    public int getUserId() { return userId; }
-    public void setUserId(int userId) { this.userId = userId; }
+    public String getAccountNumber() { return accountNumber; }
+    public void setAccountNumber(String accountNumber) { this.accountNumber = accountNumber; }
 
-    public String getAccountNo() { return accountNo; }
-    public void setAccountNo(String accountNo) { this.accountNo = accountNo; }
+    public double getBalance() { return balance; }
+    public void setBalance(double balance) { this.balance = balance; }
 
-    public String getBalance() { return balance; }
-    public void setBalance(String balance) { this.balance = balance; }
+    public String getAccountType() { return accountType; }
+    public void setAccountType(String accountType) { this.accountType = accountType; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

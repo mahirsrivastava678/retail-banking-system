@@ -9,6 +9,15 @@ import java.util.List;  // ✅ Needed for List<User>
 
 @Service
 public class UserService {
+    public String loginUser(User user) {
+        User existingUser = userRepository.findByEmail(user.getEmail());
+
+        if (existingUser != null && existingUser.getPassword().equals(user.getPassword())) {
+            return "Login Successful";
+        } else {
+            return "Invalid Email or Password";
+        }
+    }
 
     @Autowired
     private UserRepository userRepository;

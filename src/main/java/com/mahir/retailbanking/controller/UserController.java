@@ -11,6 +11,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class UserController {
+    @PostMapping("/login")
+    public String login(@RequestBody User user) {
+        return userService.loginUser(user);
+    }
 
     @Autowired
     private UserService userService;
