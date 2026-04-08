@@ -1,10 +1,7 @@
 package com.mahir.retailbanking.model;
 
 import jakarta.persistence.*;
-<<<<<<< HEAD
 import java.time.LocalDateTime;
-=======
->>>>>>> 2edd4d82b118aaa9095aa9ae65d5fe80666111b3
 
 @Entity
 public class Transaction {
@@ -16,10 +13,7 @@ public class Transaction {
     private String accountNumber;
     private String type;
     private double amount;
-<<<<<<< HEAD
     private LocalDateTime time;
-=======
->>>>>>> 2edd4d82b118aaa9095aa9ae65d5fe80666111b3
 
     public Transaction() {}
 
@@ -27,10 +21,7 @@ public class Transaction {
         this.accountNumber = accountNumber;
         this.type = type;
         this.amount = amount;
-<<<<<<< HEAD
         this.time = LocalDateTime.now();
-=======
->>>>>>> 2edd4d82b118aaa9095aa9ae65d5fe80666111b3
     }
 
     public int getId() {
@@ -60,7 +51,6 @@ public class Transaction {
     public void setAmount(double amount) {
         this.amount = amount;
     }
-<<<<<<< HEAD
 
     public LocalDateTime getTime() {
         return time;
@@ -69,6 +59,4 @@ public class Transaction {
     public void setTime(LocalDateTime time) {
         this.time = time;
     }
-=======
->>>>>>> 2edd4d82b118aaa9095aa9ae65d5fe80666111b3
 }

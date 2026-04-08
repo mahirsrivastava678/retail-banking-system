@@ -1,9 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 function Login() {
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    localStorage.clear();
+  }, []);
 
   const loginUser = async () => {
 
@@ -26,10 +31,15 @@ function Login() {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("accountNumber", res.data.accountNumber);
       localStorage.setItem("userName", res.data.userName);
+      localStorage.setItem("email", email);
 
       alert("Login Success");
 
-      window.location.href = "/Dashboard";
+      if (email === "admin@gmail.com") {
+        window.location.href = "/admin";
+      } else {
+        window.location.href = "/dashboard";
+      }
 
     } catch (error) {
       alert("Login Failed");
@@ -37,33 +47,62 @@ function Login() {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "100vh",
+      backgroundColor: "#f2f2f2"
+    }}>
 
-      <input
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+      <div style={{
+        backgroundColor: "white",
+        padding: "30px",
+        borderRadius: "10px",
+        width: "300px",
+        boxShadow: "0 0 10px gray"
+      }}>
 
-      <br /><br />
+        <h2 style={{ textAlign: "center" }}>Login</h2>
 
-      <input
-        placeholder="Password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <input
+          placeholder="Email"
+          value={email}
+          onChange={(e)=>setEmail(e.target.value)}
+          style={{ width: "100%", padding: "10px", marginBottom: "15px" }}
+        />
 
-      <br /><br />
+        <input
+          placeholder="Password"
+          type="password"
+          value={password}
+          onChange={(e)=>setPassword(e.target.value)}
+          style={{ width: "100%", padding: "10px", marginBottom: "15px" }}
+        />
 
-      <button onClick={loginUser}>Login</button>
+        <button
+          onClick={loginUser}
+          style={{
+            width: "100%",
+            padding: "10px"
+          }}
+        >
+          Login
+        </button>
 
-      <br /><br />
+        <br /><br />
 
-      <button onClick={() => window.location.href="/register"}>
-        Register
-      </button>
+        <button
+          onClick={()=>window.location.href="/register"}
+          style={{
+            width: "100%",
+            padding: "10px"
+          }}
+        >
+          Register
+        </button>
+
+      </div>
     </div>
   );
 }

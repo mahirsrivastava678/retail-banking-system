@@ -101,7 +101,8 @@ function Dashboard() {
 
     try {
       const res = await axios.put(
-        "http://localhost:8080/api/transfer/" + accountNumber + "/" + toAccount + "/" + transferAmount,
+        "http://localhost:8080/api/transfer/" +
+          accountNumber + "/" + toAccount + "/" + transferAmount,
         {},
         {
           headers: { Authorization: `Bearer ${token}` }
@@ -120,11 +121,12 @@ function Dashboard() {
   const getTransactions = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:8080/api/transactions/" + accountNumber,
+        "http://localhost:8080/api/transactions/account/" + accountNumber,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
+
       setTransactions(res.data);
       setShowHistory(true);
     } catch {
@@ -167,12 +169,7 @@ function Dashboard() {
       padding: "30px"
     }}>
 
-      <div style={{
-        ...card,
-        marginBottom: "20px",
-        background: "#1e3a8a",
-        color: "white"
-      }}>
+      <div style={{ ...card, marginBottom: "20px", background: "#1e3a8a", color: "white" }}>
         <h2>Welcome {userName}</h2>
         <h3>Account Number: {accountNumber}</h3>
       </div>

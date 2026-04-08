@@ -15,14 +15,13 @@ function Register() {
       return;
     }
 
-    const name = firstName + " " + lastName;
-
     try {
 
       await axios.post("http://localhost:8080/api/register", {
-        name: name,
-        email: email,
-        password: password
+        firstName,
+        lastName,
+        email,
+        password
       });
 
       alert("Registration Success");
@@ -34,45 +33,76 @@ function Register() {
   };
 
   return (
-    <div>
+    <div style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "100vh",
+      backgroundColor: "#f2f2f2"
+    }}>
 
-      <h2>Register</h2>
+      <div style={{
+        backgroundColor: "white",
+        padding: "30px",
+        borderRadius: "10px",
+        width: "300px",
+        boxShadow: "0 0 10px gray"
+      }}>
 
-      <input
-        placeholder="First Name"
-        value={firstName}
-        onChange={(e) => setFirstName(e.target.value)}
-      />
+        <h2 style={{ textAlign: "center" }}>Register</h2>
 
-      <br /><br />
+        <input
+          placeholder="First Name"
+          value={firstName}
+          onChange={(e)=>setFirstName(e.target.value)}
+          style={{ width: "100%", padding: "10px", marginBottom: "15px" }}
+        />
 
-      <input
-        placeholder="Last Name"
-        value={lastName}
-        onChange={(e) => setLastName(e.target.value)}
-      />
+        <input
+          placeholder="Last Name"
+          value={lastName}
+          onChange={(e)=>setLastName(e.target.value)}
+          style={{ width: "100%", padding: "10px", marginBottom: "15px" }}
+        />
 
-      <br /><br />
+        <input
+          placeholder="Email"
+          value={email}
+          onChange={(e)=>setEmail(e.target.value)}
+          style={{ width: "100%", padding: "10px", marginBottom: "15px" }}
+        />
 
-      <input
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+        <input
+          placeholder="Password"
+          type="password"
+          value={password}
+          onChange={(e)=>setPassword(e.target.value)}
+          style={{ width: "100%", padding: "10px", marginBottom: "15px" }}
+        />
 
-      <br /><br />
+        <button
+          onClick={registerUser}
+          style={{
+            width: "100%",
+            padding: "10px"
+          }}
+        >
+          Register
+        </button>
 
-      <input
-        placeholder="Password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <br /><br />
 
-      <br /><br />
+        <button
+          onClick={()=>window.location.href="/"}
+          style={{
+            width: "100%",
+            padding: "10px"
+          }}
+        >
+          Back to Login
+        </button>
 
-      <button onClick={registerUser}>Register</button>
-
+      </div>
     </div>
   );
 }

@@ -1,15 +1,31 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
 import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+import Admin from "./pages/Admin";
 
 function App() {
+
+  const token = localStorage.getItem("token");
+
   return (
     <Router>
       <Routes>
+
         <Route path="/" element={<Login />} />
+
         <Route path="/register" element={<Register />} />
-        <Route path="/Dashboard" element={<Dashboard />} />
+
+        <Route
+          path="/dashboard"
+          element={token ? <Dashboard /> : <Navigate to="/" />}
+        />
+
+        <Route
+          path="/admin"
+          element={token ? <Admin /> : <Navigate to="/" />}
+        />
+
       </Routes>
     </Router>
   );
