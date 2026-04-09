@@ -2,12 +2,7 @@ package com.mahir.retailbanking.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import com.mahir.retailbanking.model.Account;
-import com.mahir.retailbanking.model.Transaction;
 import com.mahir.retailbanking.service.AccountService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -41,15 +36,5 @@ public class AccountController {
                            @PathVariable String toAccount,
                            @PathVariable double amount) {
         return accountService.transfer(fromAccount, toAccount, amount);
-    }
-
-    @GetMapping("/account/{accountNumber}")
-    public Account getAccount(@PathVariable String accountNumber) {
-        return accountService.getAccount(accountNumber);
-    }
-
-    @GetMapping("/transactions/{accountNumber}")
-    public List<Transaction> getTransactions(@PathVariable String accountNumber) {
-        return accountService.getTransactions(accountNumber);
     }
 }

@@ -3,14 +3,13 @@ import axios from "axios";
 
 function Register() {
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const registerUser = async () => {
 
-    if (!firstName || !lastName || !email || !password) {
+    if (!name || !email || !password) {
       alert("Fill all fields");
       return;
     }
@@ -18,8 +17,7 @@ function Register() {
     try {
 
       await axios.post("http://localhost:8080/api/register", {
-        firstName,
-        lastName,
+        name,
         email,
         password
       });
@@ -27,7 +25,7 @@ function Register() {
       alert("Registration Success");
       window.location.href = "/";
 
-    } catch (error) {
+    } catch {
       alert("Registration Failed");
     }
   };
@@ -40,7 +38,6 @@ function Register() {
       height: "100vh",
       backgroundColor: "#f2f2f2"
     }}>
-
       <div style={{
         backgroundColor: "white",
         padding: "30px",
@@ -52,16 +49,9 @@ function Register() {
         <h2 style={{ textAlign: "center" }}>Register</h2>
 
         <input
-          placeholder="First Name"
-          value={firstName}
-          onChange={(e)=>setFirstName(e.target.value)}
-          style={{ width: "100%", padding: "10px", marginBottom: "15px" }}
-        />
-
-        <input
-          placeholder="Last Name"
-          value={lastName}
-          onChange={(e)=>setLastName(e.target.value)}
+          placeholder="Full Name"
+          value={name}
+          onChange={(e)=>setName(e.target.value)}
           style={{ width: "100%", padding: "10px", marginBottom: "15px" }}
         />
 
@@ -82,10 +72,7 @@ function Register() {
 
         <button
           onClick={registerUser}
-          style={{
-            width: "100%",
-            padding: "10px"
-          }}
+          style={{ width: "100%", padding: "10px" }}
         >
           Register
         </button>
@@ -94,10 +81,7 @@ function Register() {
 
         <button
           onClick={()=>window.location.href="/"}
-          style={{
-            width: "100%",
-            padding: "10px"
-          }}
+          style={{ width: "100%", padding: "10px" }}
         >
           Back to Login
         </button>

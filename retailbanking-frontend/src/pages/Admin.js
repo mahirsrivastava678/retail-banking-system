@@ -5,11 +5,13 @@ function Admin() {
   const [users, setUsers] = useState([]);
   const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
+  const [loans, setLoans] = useState([]);
 
   useEffect(() => {
     loadUsers();
     loadAccounts();
     loadTransactions();
+    loadLoans();
   }, []);
 
   const loadUsers = async () => {
@@ -25,6 +27,17 @@ function Admin() {
   const loadTransactions = async () => {
     const res = await axios.get("http://localhost:8080/api/admin/transactions");
     setTransactions(res.data);
+  };
+
+  const loadLoans = async () => {
+    const res = await axios.get("http://localhost:8080/api/loan/all");
+    setLoans(res.data);
+  };
+
+  const approveLoan = async (id) => {
+    await axios.put("http://localhost:8080/api/loan/approve/" + id);
+    alert("Loan Approved");
+    loadLoans();
   };
 
   const deleteUser = async (id) => {
@@ -79,7 +92,6 @@ function Admin() {
               <th>Action</th>
             </tr>
           </thead>
-
           <tbody>
             {users.map((u,index)=>(
               <tr key={index}>
@@ -106,7 +118,6 @@ function Admin() {
               <th>Balance</th>
             </tr>
           </thead>
-
           <tbody>
             {accounts.map((a,index)=>(
               <tr key={index}>
@@ -128,13 +139,42 @@ function Admin() {
               <th>Amount</th>
             </tr>
           </thead>
-
           <tbody>
             {transactions.map((t,index)=>(
               <tr key={index}>
                 <td>{t.accountNumber}</td>
                 <td>{t.type}</td>
                 <td>{t.amount}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div style={card}>
+        <h3>Loan Requests</h3>
+        <table border="1" cellPadding="10" style={{ width: "100%" }}>
+          <thead>
+            <tr>
+              <th>Account</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loans.map((l,index)=>(
+              <tr key={index}>
+                <td>{l.accountNumber}</td>
+                <td>{l.amount}</td>
+                <td>{l.status}</td>
+                <td>
+                  {l.status === "Pending" && (
+                    <button style={button} onClick={() => approveLoan(l.id)}>
+                      Approve
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>

@@ -7,8 +7,11 @@ function Dashboard() {
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [transferAmount, setTransferAmount] = useState("");
   const [toAccount, setToAccount] = useState("");
+  const [loanAmount, setLoanAmount] = useState("");
   const [transactions, setTransactions] = useState([]);
+  const [loans, setLoans] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [showLoanTable, setShowLoanTable] = useState(false);
 
   const token = localStorage.getItem("token");
   const accountNumber = localStorage.getItem("accountNumber");
@@ -17,6 +20,8 @@ function Dashboard() {
   useEffect(() => {
     if (!token) {
       window.location.href = "/";
+    } else {
+      getBalance();
     }
   }, [token]);
 
@@ -35,8 +40,8 @@ function Dashboard() {
   };
 
   const depositMoney = async () => {
-    if (!depositAmount || depositAmount <= 0) {
-      alert("Enter valid amount");
+    if (depositAmount === "" || Number(depositAmount) <= 0) {
+      alert("Enter valid deposit amount");
       return;
     }
 
@@ -57,8 +62,8 @@ function Dashboard() {
   };
 
   const withdrawMoney = async () => {
-    if (!withdrawAmount || withdrawAmount <= 0) {
-      alert("Enter valid amount");
+    if (withdrawAmount === "" || Number(withdrawAmount) <= 0) {
+      alert("Enter valid withdraw amount");
       return;
     }
 
@@ -84,13 +89,8 @@ function Dashboard() {
   };
 
   const transferMoney = async () => {
-    if (!toAccount || !transferAmount || transferAmount <= 0) {
-      alert("Enter valid details");
-      return;
-    }
-
-    if (toAccount === accountNumber) {
-      alert("Cannot transfer to same account");
+    if (transferAmount === "" || Number(transferAmount) <= 0 || toAccount === "") {
+      alert("Enter valid transfer details");
       return;
     }
 
@@ -115,6 +115,37 @@ function Dashboard() {
       getBalance();
     } catch {
       alert("Transfer Failed");
+    }
+  };
+
+  const applyLoan = async () => {
+    if (loanAmount === "" || Number(loanAmount) <= 0) {
+      alert("Enter valid loan amount");
+      return;
+    }
+
+    try {
+      await axios.post("http://localhost:8080/api/loan/apply", {
+        accountNumber,
+        amount: loanAmount
+      });
+
+      alert("Loan Applied Successfully");
+      setLoanAmount("");
+    } catch {
+      alert("Loan Apply Failed");
+    }
+  };
+
+  const getLoans = async () => {
+    try {
+      const res = await axios.get(
+        "http://localhost:8080/api/loan/" + accountNumber
+      );
+      setLoans(res.data);
+      setShowLoanTable(true);
+    } catch {
+      alert("Loan load failed");
     }
   };
 
@@ -190,9 +221,8 @@ function Dashboard() {
           <h3>Deposit</h3>
           <input
             style={input}
-            placeholder="Enter amount"
             value={depositAmount}
-            onChange={(e) => setDepositAmount(e.target.value)}
+            onChange={(e)=>setDepositAmount(e.target.value)}
           />
           <button style={button} onClick={depositMoney}>Deposit</button>
         </div>
@@ -201,9 +231,8 @@ function Dashboard() {
           <h3>Withdraw</h3>
           <input
             style={input}
-            placeholder="Enter amount"
             value={withdrawAmount}
-            onChange={(e) => setWithdrawAmount(e.target.value)}
+            onChange={(e)=>setWithdrawAmount(e.target.value)}
           />
           <button style={button} onClick={withdrawMoney}>Withdraw</button>
         </div>
@@ -214,16 +243,47 @@ function Dashboard() {
             style={input}
             placeholder="Receiver Account"
             value={toAccount}
-            onChange={(e) => setToAccount(e.target.value)}
+            onChange={(e)=>setToAccount(e.target.value)}
           />
           <input
             style={input}
-            placeholder="Enter amount"
             value={transferAmount}
-            onChange={(e) => setTransferAmount(e.target.value)}
+            onChange={(e)=>setTransferAmount(e.target.value)}
           />
           <button style={button} onClick={transferMoney}>Transfer</button>
         </div>
+
+        <div style={card}>
+          <h3>Loan Apply</h3>
+          <input
+            style={input}
+            placeholder="Enter Loan Amount"
+            value={loanAmount}
+            onChange={(e)=>setLoanAmount(e.target.value)}
+          />
+          <button style={button} onClick={applyLoan}>Apply Loan</button>
+          <button style={button} onClick={getLoans}>Check Loan Status</button>
+
+          {showLoanTable && (
+            <table border="1" cellPadding="10" style={{ marginTop: "20px", width: "100%" }}>
+              <thead>
+                <tr>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loans.map((l,index)=>(
+                  <tr key={index}>
+                    <td>{l.amount}</td>
+                    <td>{l.status}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+
       </div>
 
       <div style={{ ...card, marginTop: "20px" }}>
@@ -241,7 +301,7 @@ function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {transactions.map((t, index) => (
+              {transactions.map((t,index)=>(
                 <tr key={index}>
                   <td>{t.accountNumber}</td>
                   <td>{t.type}</td>
