@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 function Dashboard() {
+
   const [balance, setBalance] = useState("");
   const [hasCheckedBalance, setHasCheckedBalance] = useState(false);
 
@@ -17,18 +18,36 @@ function Dashboard() {
   const [showHistory, setShowHistory] = useState(false);
   const [showLoanTable, setShowLoanTable] = useState(false);
 
+  // ✅ PROFILE
+  const [profile, setProfile] = useState({});
+  const [editMode, setEditMode] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+
   const token = localStorage.getItem("token");
   const accountNumber = localStorage.getItem("accountNumber");
-  const userName = localStorage.getItem("userName");
-  const email = localStorage.getItem("email");
 
   useEffect(() => {
     if (!token) {
       window.location.href = "/";
+    } else {
+      getProfile();
     }
   }, [token]);
 
-  // BALANCE
+  // ✅ GET PROFILE
+  const getProfile = async () => {
+    try {
+      const res = await axios.get(
+        "http://localhost:8080/api/profile/" + accountNumber
+      );
+      setProfile(res.data);
+    } catch {
+      alert("Profile load failed");
+    }
+  };
+
+  // ✅ BALANCE
   const getBalance = async () => {
     try {
       const res = await axios.get(
@@ -42,9 +61,9 @@ function Dashboard() {
     }
   };
 
-  // DEPOSIT
+  // ✅ DEPOSIT
   const depositMoney = async () => {
-    if (!depositAmount || depositAmount <= 0)
+    if (!depositAmount || Number(depositAmount) <= 0)
       return alert("Enter valid amount");
 
     await axios.put(
@@ -58,9 +77,9 @@ function Dashboard() {
     if (hasCheckedBalance) getBalance();
   };
 
-  // WITHDRAW
+  // ✅ WITHDRAW
   const withdrawMoney = async () => {
-    if (!withdrawAmount || withdrawAmount <= 0)
+    if (!withdrawAmount || Number(withdrawAmount) <= 0)
       return alert("Enter valid amount");
 
     if (Number(withdrawAmount) > Number(balance))
@@ -77,7 +96,7 @@ function Dashboard() {
     if (hasCheckedBalance) getBalance();
   };
 
-  // TRANSFER
+  // ✅ TRANSFER
   const transferMoney = async () => {
     if (!transferAmount || !toAccount)
       return alert("Enter details");
@@ -98,9 +117,9 @@ function Dashboard() {
     if (hasCheckedBalance) getBalance();
   };
 
-  // LOAN
+  // ✅ LOAN
   const applyLoan = async () => {
-    if (!loanAmount || loanAmount <= 0)
+    if (!loanAmount || Number(loanAmount) <= 0)
       return alert("Enter valid loan amount");
 
     await axios.post("http://localhost:8080/api/loan/apply", {
@@ -120,7 +139,7 @@ function Dashboard() {
     setShowLoanTable(true);
   };
 
-  // TRANSACTIONS
+  // ✅ TRANSACTIONS
   const getTransactions = async () => {
     const res = await axios.get(
       "http://localhost:8080/api/transactions/account/" + accountNumber,
@@ -130,108 +149,129 @@ function Dashboard() {
     setShowHistory(true);
   };
 
+  // ✅ UPDATE PROFILE
+  const updateProfile = async () => {
+    if (!newName && !newPassword)
+      return alert("Enter something");
+
+    try {
+      await axios.put("http://localhost:8080/api/profile/update", {
+        accountNumber,
+        name: newName || profile.name,
+        email: profile.email,
+        password: newPassword
+      });
+
+      alert("Profile Updated");
+
+      setEditMode(false);
+      setNewName("");
+      setNewPassword("");
+
+      getProfile();
+
+    } catch {
+      alert("Update Failed");
+    }
+  };
+
   const logoutUser = () => {
     localStorage.clear();
     window.location.href = "/";
-  };
-
-  const card = {
-    background: "white",
-    borderRadius: "15px",
-    padding: "20px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.15)"
-  };
-
-  const input = {
-    width: "100%",
-    padding: "10px",
-    marginTop: "10px"
-  };
-
-  const button = {
-    marginTop: "10px",
-    padding: "10px",
-    cursor: "pointer"
   };
 
   return (
     <div style={{ padding: "30px" }}>
 
       {/* PROFILE */}
-      <div style={{ ...card, background: "#1e3a8a", color: "white" }}>
-        <h2>Welcome {userName}</h2>
-        <p>Email: {email}</p>
+      <div style={{ background: "#1e3a8a", color: "white", padding: "20px" }}>
+        <h2>Welcome {profile.name || "User"}</h2>
+        <p>Email: {profile.email || "Not available"}</p>
         <h3>Account: {accountNumber}</h3>
+
+        <button onClick={() => setEditMode(true)}>Edit Profile</button>
+
+        {editMode && (
+          <div>
+            <input
+              placeholder="New Name"
+              value={newName}
+              onChange={(e)=>setNewName(e.target.value)}
+            />
+            <input
+              placeholder="New Password"
+              type="password"
+              value={newPassword}
+              onChange={(e)=>setNewPassword(e.target.value)}
+            />
+            <button onClick={updateProfile}>Save</button>
+          </div>
+        )}
       </div>
 
-      {/* FEATURES */}
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: "20px",
-        marginTop: "20px"
-      }}>
+      {/* BALANCE */}
+      <div>
+        <h3>Balance</h3>
+        <button onClick={getBalance}>Check Balance</button>
+        <h2>{hasCheckedBalance ? balance : ""}</h2>
+      </div>
 
-        <div style={card}>
-          <h3>Balance</h3>
-          <button onClick={getBalance}>Check</button>
-          <h2>{hasCheckedBalance ? balance : ""}</h2>
-        </div>
+      {/* DEPOSIT */}
+      <div>
+        <h3>Deposit</h3>
+        <input value={depositAmount} onChange={(e)=>setDepositAmount(e.target.value)} />
+        <button onClick={depositMoney}>Deposit</button>
+      </div>
 
-        <div style={card}>
-          <h3>Deposit</h3>
-          <input style={input} value={depositAmount} onChange={e=>setDepositAmount(e.target.value)} />
-          <button onClick={depositMoney}>Deposit</button>
-        </div>
+      {/* WITHDRAW */}
+      <div>
+        <h3>Withdraw</h3>
+        <input value={withdrawAmount} onChange={(e)=>setWithdrawAmount(e.target.value)} />
+        <button onClick={withdrawMoney}>Withdraw</button>
+      </div>
 
-        <div style={card}>
-          <h3>Withdraw</h3>
-          <input style={input} value={withdrawAmount} onChange={e=>setWithdrawAmount(e.target.value)} />
-          <button onClick={withdrawMoney}>Withdraw</button>
-        </div>
+      {/* TRANSFER */}
+      <div>
+        <h3>Transfer</h3>
+        <input placeholder="Receiver" value={toAccount} onChange={(e)=>setToAccount(e.target.value)} />
+        <input value={transferAmount} onChange={(e)=>setTransferAmount(e.target.value)} />
+        <button onClick={transferMoney}>Transfer</button>
+      </div>
 
-        <div style={card}>
-          <h3>Transfer</h3>
-          <input style={input} placeholder="Receiver Account" value={toAccount} onChange={e=>setToAccount(e.target.value)} />
-          <input style={input} value={transferAmount} onChange={e=>setTransferAmount(e.target.value)} />
-          <button onClick={transferMoney}>Transfer</button>
-        </div>
+      {/* LOAN */}
+      <div>
+        <h3>Loan</h3>
+        <input value={loanAmount} onChange={(e)=>setLoanAmount(e.target.value)} />
+        <button onClick={applyLoan}>Apply</button>
+        <button onClick={getLoans}>Check Status</button>
 
-        <div style={card}>
-          <h3>Loan</h3>
-          <input style={input} value={loanAmount} onChange={e=>setLoanAmount(e.target.value)} />
-          <button onClick={applyLoan}>Apply</button>
-          <button onClick={getLoans}>Status</button>
-
-          {showLoanTable && (
-            <table border="1" style={{ marginTop: "10px", width: "100%" }}>
-              <thead>
-                <tr>
-                  <th>Amount</th>
-                  <th>Status</th>
+        {showLoanTable && (
+          <table border="1">
+            <thead>
+              <tr>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loans.map((l,i)=>(
+                <tr key={i}>
+                  <td>{l.amount}</td>
+                  <td>{l.status}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {loans.map((l,i)=>(
-                  <tr key={i}>
-                    <td>{l.amount}</td>
-                    <td>{l.status}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {/* TRANSACTIONS */}
-      <div style={{ ...card, marginTop: "20px" }}>
+      <div>
         <h3>Transactions</h3>
         <button onClick={getTransactions}>Show</button>
 
         {showHistory && (
-          <table border="1" style={{ marginTop: "10px", width: "100%" }}>
+          <table border="1">
             <thead>
               <tr>
                 <th>Type</th>
@@ -250,9 +290,7 @@ function Dashboard() {
         )}
       </div>
 
-      <div style={{ textAlign: "center", marginTop: "20px" }}>
-        <button onClick={logoutUser}>Logout</button>
-      </div>
+      <button onClick={logoutUser}>Logout</button>
 
     </div>
   );
