@@ -27,11 +27,6 @@ public class UserService {
 
         user.setAccountNumber(accountNumber);
 
-        // ✅ FIX NAME
-        if (user.getName() == null || user.getName().isEmpty()) {
-            user.setName("User");
-        }
-
         User savedUser = userRepository.save(user);
 
         Account account = new Account();
@@ -61,7 +56,11 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    // GET PROFILE
+    // =========================
+    // PROFILE FEATURE START
+    // =========================
+
+    // GET USER BY ACCOUNT NUMBER
     public User getUserByAccountNumber(String accountNumber) {
         return userRepository.findByAccountNumber(accountNumber);
     }
@@ -72,18 +71,9 @@ public class UserService {
         User existing = userRepository.findByAccountNumber(user.getAccountNumber());
 
         if (existing != null) {
-
-            if (user.getName() != null && !user.getName().isEmpty()) {
-                existing.setName(user.getName());
-            }
-
-            if (user.getEmail() != null && !user.getEmail().isEmpty()) {
-                existing.setEmail(user.getEmail());
-            }
-
-            if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-                existing.setPassword(user.getPassword());
-            }
+            existing.setName(user.getName());
+            existing.setEmail(user.getEmail());
+            existing.setPassword(user.getPassword());
 
             return userRepository.save(existing);
         }
