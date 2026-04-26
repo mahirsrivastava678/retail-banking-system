@@ -3,131 +3,166 @@ import axios from "axios";
 
 function Dashboard() {
   const [balance, setBalance] = useState("");
-  const [hasCheckedBalance, setHasCheckedBalance] = useState(false);
-
   const [depositAmount, setDepositAmount] = useState("");
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [transferAmount, setTransferAmount] = useState("");
   const [toAccount, setToAccount] = useState("");
   const [loanAmount, setLoanAmount] = useState("");
-
   const [transactions, setTransactions] = useState([]);
   const [loans, setLoans] = useState([]);
-
   const [showHistory, setShowHistory] = useState(false);
   const [showLoanTable, setShowLoanTable] = useState(false);
 
   const token = localStorage.getItem("token");
   const accountNumber = localStorage.getItem("accountNumber");
   const userName = localStorage.getItem("userName");
-  const email = localStorage.getItem("email");
 
   useEffect(() => {
     if (!token) {
       window.location.href = "/";
+    } else {
+      getBalance();
     }
   }, [token]);
 
-  // BALANCE
   const getBalance = async () => {
     try {
       const res = await axios.get(
         "http://localhost:8080/api/balance/" + accountNumber,
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
       );
       setBalance(res.data);
-      setHasCheckedBalance(true);
     } catch {
       alert("Balance load failed");
     }
   };
 
-  // DEPOSIT
   const depositMoney = async () => {
-    if (!depositAmount || depositAmount <= 0)
-      return alert("Enter valid amount");
+    if (depositAmount === "" || Number(depositAmount) <= 0) {
+      alert("Enter valid deposit amount");
+      return;
+    }
 
-    await axios.put(
-      "http://localhost:8080/api/deposit/" + accountNumber + "/" + depositAmount,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    alert("Deposit Success");
-    setDepositAmount("");
-    if (hasCheckedBalance) getBalance();
+    try {
+      await axios.put(
+        "http://localhost:8080/api/deposit/" + accountNumber + "/" + depositAmount,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      alert("Deposit Success");
+      setDepositAmount("");
+      getBalance();
+    } catch {
+      alert("Deposit Failed");
+    }
   };
 
-  // WITHDRAW
   const withdrawMoney = async () => {
-    if (!withdrawAmount || withdrawAmount <= 0)
-      return alert("Enter valid amount");
+    if (withdrawAmount === "" || Number(withdrawAmount) <= 0) {
+      alert("Enter valid withdraw amount");
+      return;
+    }
 
-    if (Number(withdrawAmount) > Number(balance))
-      return alert("Insufficient balance");
+    if (Number(withdrawAmount) > Number(balance)) {
+      alert("Insufficient balance");
+      return;
+    }
 
-    await axios.put(
-      "http://localhost:8080/api/withdraw/" + accountNumber + "/" + withdrawAmount,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    alert("Withdraw Success");
-    setWithdrawAmount("");
-    if (hasCheckedBalance) getBalance();
+    try {
+      await axios.put(
+        "http://localhost:8080/api/withdraw/" + accountNumber + "/" + withdrawAmount,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      alert("Withdraw Success");
+      setWithdrawAmount("");
+      getBalance();
+    } catch {
+      alert("Withdraw Failed");
+    }
   };
 
-  // TRANSFER
   const transferMoney = async () => {
-    if (!transferAmount || !toAccount)
-      return alert("Enter details");
+    if (transferAmount === "" || Number(transferAmount) <= 0 || toAccount === "") {
+      alert("Enter valid transfer details");
+      return;
+    }
 
-    if (Number(transferAmount) > Number(balance))
-      return alert("Insufficient balance");
+    if (Number(transferAmount) > Number(balance)) {
+      alert("Insufficient balance");
+      return;
+    }
 
-    await axios.put(
-      "http://localhost:8080/api/transfer/" +
-        accountNumber + "/" + toAccount + "/" + transferAmount,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    try {
+      const res = await axios.put(
+        "http://localhost:8080/api/transfer/" +
+          accountNumber + "/" + toAccount + "/" + transferAmount,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
 
-    alert("Transfer Success");
-    setTransferAmount("");
-    setToAccount("");
-    if (hasCheckedBalance) getBalance();
+      alert(res.data);
+      setTransferAmount("");
+      setToAccount("");
+      getBalance();
+    } catch {
+      alert("Transfer Failed");
+    }
   };
 
-  // LOAN
   const applyLoan = async () => {
-    if (!loanAmount || loanAmount <= 0)
-      return alert("Enter valid loan amount");
+    if (loanAmount === "" || Number(loanAmount) <= 0) {
+      alert("Enter valid loan amount");
+      return;
+    }
 
-    await axios.post("http://localhost:8080/api/loan/apply", {
-      accountNumber,
-      amount: loanAmount
-    });
+    try {
+      await axios.post("http://localhost:8080/api/loan/apply", {
+        accountNumber,
+        amount: loanAmount
+      });
 
-    alert("Loan Applied");
-    setLoanAmount("");
+      alert("Loan Applied Successfully");
+      setLoanAmount("");
+    } catch {
+      alert("Loan Apply Failed");
+    }
   };
 
   const getLoans = async () => {
-    const res = await axios.get(
-      "http://localhost:8080/api/loan/" + accountNumber
-    );
-    setLoans(res.data);
-    setShowLoanTable(true);
+    try {
+      const res = await axios.get(
+        "http://localhost:8080/api/loan/" + accountNumber
+      );
+      setLoans(res.data);
+      setShowLoanTable(true);
+    } catch {
+      alert("Loan load failed");
+    }
   };
 
-  // TRANSACTIONS
   const getTransactions = async () => {
-    const res = await axios.get(
-      "http://localhost:8080/api/transactions/account/" + accountNumber,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    setTransactions(res.data);
-    setShowHistory(true);
+    try {
+      const res = await axios.get(
+        "http://localhost:8080/api/transactions/account/" + accountNumber,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      setTransactions(res.data);
+      setShowHistory(true);
+    } catch {
+      alert("Transaction load failed");
+    }
   };
 
   const logoutUser = () => {
@@ -145,66 +180,92 @@ function Dashboard() {
   const input = {
     width: "100%",
     padding: "10px",
-    marginTop: "10px"
+    marginTop: "10px",
+    borderRadius: "8px",
+    border: "1px solid #ccc"
   };
 
   const button = {
     marginTop: "10px",
-    padding: "10px",
+    padding: "10px 20px",
+    borderRadius: "8px",
+    border: "none",
     cursor: "pointer"
   };
 
   return (
-    <div style={{ padding: "30px" }}>
+    <div style={{
+      background: "linear-gradient(to right, #dfe9f3, #ffffff)",
+      minHeight: "100vh",
+      padding: "30px"
+    }}>
 
-      {/* PROFILE */}
-      <div style={{ ...card, background: "#1e3a8a", color: "white" }}>
+      <div style={{ ...card, marginBottom: "20px", background: "#1e3a8a", color: "white" }}>
         <h2>Welcome {userName}</h2>
-        <p>Email: {email}</p>
-        <h3>Account: {accountNumber}</h3>
+        <h3>Account Number: {accountNumber}</h3>
       </div>
 
-      {/* FEATURES */}
       <div style={{
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
-        gap: "20px",
-        marginTop: "20px"
+        gap: "20px"
       }}>
 
         <div style={card}>
           <h3>Balance</h3>
-          <button onClick={getBalance}>Check</button>
-          <h2>{hasCheckedBalance ? balance : ""}</h2>
+          <button style={button} onClick={getBalance}>Check Balance</button>
+          <h2>{balance}</h2>
         </div>
 
         <div style={card}>
           <h3>Deposit</h3>
-          <input style={input} value={depositAmount} onChange={e=>setDepositAmount(e.target.value)} />
-          <button onClick={depositMoney}>Deposit</button>
+          <input
+            style={input}
+            value={depositAmount}
+            onChange={(e)=>setDepositAmount(e.target.value)}
+          />
+          <button style={button} onClick={depositMoney}>Deposit</button>
         </div>
 
         <div style={card}>
           <h3>Withdraw</h3>
-          <input style={input} value={withdrawAmount} onChange={e=>setWithdrawAmount(e.target.value)} />
-          <button onClick={withdrawMoney}>Withdraw</button>
+          <input
+            style={input}
+            value={withdrawAmount}
+            onChange={(e)=>setWithdrawAmount(e.target.value)}
+          />
+          <button style={button} onClick={withdrawMoney}>Withdraw</button>
         </div>
 
         <div style={card}>
           <h3>Transfer</h3>
-          <input style={input} placeholder="Receiver Account" value={toAccount} onChange={e=>setToAccount(e.target.value)} />
-          <input style={input} value={transferAmount} onChange={e=>setTransferAmount(e.target.value)} />
-          <button onClick={transferMoney}>Transfer</button>
+          <input
+            style={input}
+            placeholder="Receiver Account"
+            value={toAccount}
+            onChange={(e)=>setToAccount(e.target.value)}
+          />
+          <input
+            style={input}
+            value={transferAmount}
+            onChange={(e)=>setTransferAmount(e.target.value)}
+          />
+          <button style={button} onClick={transferMoney}>Transfer</button>
         </div>
 
         <div style={card}>
-          <h3>Loan</h3>
-          <input style={input} value={loanAmount} onChange={e=>setLoanAmount(e.target.value)} />
-          <button onClick={applyLoan}>Apply</button>
-          <button onClick={getLoans}>Status</button>
+          <h3>Loan Apply</h3>
+          <input
+            style={input}
+            placeholder="Enter Loan Amount"
+            value={loanAmount}
+            onChange={(e)=>setLoanAmount(e.target.value)}
+          />
+          <button style={button} onClick={applyLoan}>Apply Loan</button>
+          <button style={button} onClick={getLoans}>Check Loan Status</button>
 
           {showLoanTable && (
-            <table border="1" style={{ marginTop: "10px", width: "100%" }}>
+            <table border="1" cellPadding="10" style={{ marginTop: "20px", width: "100%" }}>
               <thead>
                 <tr>
                   <th>Amount</th>
@@ -212,8 +273,8 @@ function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {loans.map((l,i)=>(
-                  <tr key={i}>
+                {loans.map((l,index)=>(
+                  <tr key={index}>
                     <td>{l.amount}</td>
                     <td>{l.status}</td>
                   </tr>
@@ -225,24 +286,27 @@ function Dashboard() {
 
       </div>
 
-      {/* TRANSACTIONS */}
       <div style={{ ...card, marginTop: "20px" }}>
-        <h3>Transactions</h3>
-        <button onClick={getTransactions}>Show</button>
+        <h3>Transaction History</h3>
+        <button style={button} onClick={getTransactions}>Show Transactions</button>
 
         {showHistory && (
-          <table border="1" style={{ marginTop: "10px", width: "100%" }}>
+          <table border="1" cellPadding="10" style={{ marginTop: "20px", width: "100%" }}>
             <thead>
               <tr>
+                <th>Account</th>
                 <th>Type</th>
                 <th>Amount</th>
+                <th>Time</th>
               </tr>
             </thead>
             <tbody>
-              {transactions.map((t,i)=>(
-                <tr key={i}>
+              {transactions.map((t,index)=>(
+                <tr key={index}>
+                  <td>{t.accountNumber}</td>
                   <td>{t.type}</td>
                   <td>{t.amount}</td>
+                  <td>{t.time}</td>
                 </tr>
               ))}
             </tbody>
@@ -250,8 +314,8 @@ function Dashboard() {
         )}
       </div>
 
-      <div style={{ textAlign: "center", marginTop: "20px" }}>
-        <button onClick={logoutUser}>Logout</button>
+      <div style={{ marginTop: "20px", textAlign: "center" }}>
+        <button style={button} onClick={logoutUser}>Logout</button>
       </div>
 
     </div>
